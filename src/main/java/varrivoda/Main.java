@@ -75,10 +75,14 @@ public class Main {
             List<JsonElement> actions =new ArrayList<>();
             actions.addAll(jsonSearch(response, "reloadContinuationItemsCommand"));
             actions.addAll(jsonSearch(response, "appendContinuationItemsAction"));
+            //actions.forEach(a->System.out.println("\n\nNEXT ACTION: \n" + a));
+
 
             for(JsonElement action: actions){
                 JsonArray items = action.getAsJsonObject().get("continuationItems").getAsJsonArray();
                 for(JsonElement item: items){
+                    //System.out.println("\n\n NEXT ITEM:" + item);
+                    // System.out.println("ACTION.targetId"+);
                     if(List.of("comments-section",
                                     "engagement-panel-comments-section",
                                     "shorts-engagement-panel-comments-section")
@@ -101,9 +105,12 @@ public class Main {
             //toolbarPayloads
             //toolbarStates
 
-            for(JsonElement comment: jsonSearch(response, "CommentEntityPayload")){
+            jsonSearch(response, "commentEntityPayload")
+                    .forEach(s-> System.out.println("\n\n NEXT CommentEntityPayload: \n" + s));
 
-                System.out.println("\n\n FOR COMMENT: response() \n" + comment.toString());
+            for(JsonElement comment: jsonSearch(response, "commentEntityPayload")){
+
+                //System.out.println("\n\n FOR COMMENT: response() \n" + comment.toString());
 
                 String commentText = comment.getAsJsonObject().get("properties")
                         .getAsJsonObject().get("content")
