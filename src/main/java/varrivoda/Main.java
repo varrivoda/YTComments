@@ -9,6 +9,8 @@ import kong.unirest.*;
 import kong.unirest.gson.GsonObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +27,7 @@ public class Main {
         String RE_DATA = "(?:ytInitialData)\s*=\s*(.+?)\s*;\s*(?:</script|\n)";
 
         JsonElement response;
-        String url = "https://youtube.com/watch?v=9pdQeM0w3xQ";
+        String url = "https://youtube.com/watch?v=mxLgL5pk0qg";
 
         GetRequest getRequest = Unirest.get(url);
         String html = getRequest.asString().getBody();
@@ -35,14 +37,15 @@ public class Main {
         //TODO переделать в регулярку
         ytConfig = ytConfig.substring(10,ytConfig.length()-2);
 
+        //DATA
         String ytData = regexSearch(html, RE_DATA);
         ytData = ytData.substring(16,ytData.length()-9);
         JsonElement jsonElement =JsonParser.parseString(ytData);
-
-        JsonElement sortMenuu=jsonSearch(jsonElement, "sortFilterSubMenuRenderer")
-                .get(0)
-                .getAsJsonObject()
-                .get("subMenuItems");
+//
+//        JsonElement sortMenuu=jsonSearch(jsonElement, "sortFilterSubMenuRenderer")
+//                .get(0)
+//                .getAsJsonObject()
+//                .get("subMenuItems");
 
         List<JsonElement> sortMenu=jsonSearch(jsonElement, "sortFilterSubMenuRenderer").stream()
                 .map(element->{return element.getAsJsonObject().get("subMenuItems");})
@@ -54,7 +57,33 @@ public class Main {
         continuations.forEach(s-> System.out.println("\n NEXT CONTINUATION:\n" + s));
 
         List<JsonElement> comments = getComments(continuations, JsonParser.parseString(ytConfig));
-        comments.forEach(c-> System.out.println("\n NEXT COMMENT: \n" + c));
+
+        Collections.sort(comments ,new Comparator<JsonElement>(){
+            //a negative integer, zero, or a positive integer
+            // as the first argument is less than, equal to, or greater than the second
+            @Override
+            public int compare(JsonElement comment1, JsonElement comment2) {
+
+                String comment1IdPart = comment1.getAsJsonObject().get("commentId").getAsString().split("\\.")[0];//.compareTo()
+                String comment2IdPart = comment2.getAsJsonObject().get("commentId").getAsString().split("\\.")[0];//.compareTo()
+                int commentIdComparison = comment1IdPart.compareTo(comment2IdPart);
+                if(commentIdComparison == 0){
+                    return Integer.valueOf(comment1.getAsJsonObject().get("indexNumber").getAsInt())
+                            .compareTo(Integer.valueOf(comment2.getAsJsonObject().get("indexNumber").getAsInt()));
+
+                }
+                return commentIdComparison;
+            }
+        });
+
+        comments.forEach(c-> System.out.println(
+                c.getAsJsonObject().get("authorName").getAsString()
+                + " " + c.getAsJsonObject().get("commentTime").getAsString()
+                + ": \n"
+                + c.getAsJsonObject().get("commentText").getAsString()
+                )
+        );
+
 
 //        System.out.println(sortMenu);
 
@@ -62,8 +91,8 @@ public class Main {
     }
 
     public static List<JsonElement> getComments(List<JsonElement> continuations, JsonElement ytConfig) throws UnirestException {
-        JsonArray comments = new JsonArray();
-        JsonObject newComment = new JsonObject();
+        List<JsonElement> comments = new ArrayList<>();
+        int i = 0;
 
         while (!continuations.isEmpty()) {
             JsonElement continuation = continuations.remove(0);
@@ -93,8 +122,9 @@ public class Main {
 
                     if(action.getAsJsonObject().get("targetId").getAsString()
                             .startsWith("comment-replies-item")
-                            && Stream.of(item.getAsJsonArray()).map(e->e.getAsString())
-                            .toList().contains("continuationItemRenderer")){
+                            && //(Stream.of(
+                                    item.getAsJsonObject().keySet()/*Array()).map(e->e.getAsString())
+                            .toList()*/.contains("continuationItemRenderer")){
                         continuations.add(jsonSearch(item,"buttonRenderer").get(0)
                                 .getAsJsonObject().get("command"));
                     }
@@ -105,11 +135,10 @@ public class Main {
             //toolbarPayloads
             //toolbarStates
 
-            jsonSearch(response, "commentEntityPayload")
-                    .forEach(s-> System.out.println("\n\n NEXT CommentEntityPayload: \n" + s));
+            //jsonSearch(response, "commentEntityPayload").forEach(s-> System.out.println("\n\n NEXT CommentEntityPayload: \n" + s));
 
             for(JsonElement comment: jsonSearch(response, "commentEntityPayload")){
-
+                JsonObject newComment = new JsonObject();
                 //System.out.println("\n\n FOR COMMENT: response() \n" + comment.toString());
 
                 String commentText = comment.getAsJsonObject().get("properties")
@@ -117,15 +146,35 @@ public class Main {
                         .getAsJsonObject().get("content").getAsString();
                 String authorName = comment.getAsJsonObject().get("author")
                         .getAsJsonObject().get("displayName").getAsString();
+                String commentTime = comment.getAsJsonObject().get("properties")
+                        .getAsJsonObject().get("publishedTime").getAsString();
+                String commentId = comment.getAsJsonObject().get("properties")
+                        .getAsJsonObject().get("commentId").getAsString();
+                int isReply = comment.getAsJsonObject().get("properties")
+                        .getAsJsonObject().get("replyLevel").getAsInt();
 
+
+
+                newComment.addProperty("indexNumber", i++);
+                newComment.addProperty("commentId", commentId);
+                newComment.addProperty("isReply", isReply);
+                if(isReply>0){
+                    authorName = "+--Ответ: " + authorName;
+                    commentText = "          " + commentText;
+                } else {
+                    authorName = "\n"+authorName;
+                    commentText = commentText + "\n";
+                }
                 newComment.addProperty("authorName", authorName);
                 newComment.addProperty("commentText", commentText);
+                newComment.addProperty("commentTime", commentTime);
 
+
+                //System.out.println("\n\n NEW COMMENT IS: \n" + newComment);
                 comments.add(newComment);
             }
-
         }
-        return List.of(comments);
+        return comments;
     }
 
 
