@@ -8,6 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,12 +20,26 @@ public class Downloader {
     private String ytcfg;
     private String ytData;
 
+
+    private long startTimeMillis;
+    private long lastTimeMillis;
+    private int delta = 0;
+    private List<Integer> summary = new ArrayList<>();
+
     public Downloader(String url) {
+        startTimeMillis = System.currentTimeMillis();
+        lastTimeMillis = startTimeMillis;
+
         GetRequest getRequest = Unirest.get(url);
+        benchmark("first html get request");
         String html = getRequest.asString().getBody();
+        benchmark("getRequest.asString.getBody()");
+        System.out.println("html.length is "+html.length());
         this.ytcfg = regexSearch(html, RE_YTCFG);
+        benchmark("regex_Search YTCFG");
         ytcfg = ytcfg.substring(10,ytcfg.length()-2);
         this.ytData = regexSearch(html, RE_DATA);
+        benchmark("regex_Search DATA");
         ytData = ytData.substring(16,ytData.length()-9);
     }
 
@@ -38,8 +53,20 @@ public class Downloader {
         continuations.add(sortMenu.get(1).getAsJsonArray().get(0).getAsJsonObject().get("serviceEndpoint"));
 
         List<Comment> comments = getComments(continuations, JsonParser.parseString(ytcfg));
-        sortComments(comments);
-        printComments(comments);
+
+//        sortComments(comments);
+//        printComments(comments);
+
+        benchmarkResults();
+
+    }
+
+    private void benchmarkResults() {
+        System.out.println("Number of meaningful method calls = " + summary.size());
+        System.out.println("Average benchmark = " + summary.stream().collect(Collectors.averagingInt(s-> s)));
+        System.out.println("Min benchmark = " + summary.stream().min(Comparator.comparingInt(s -> s)));
+        System.out.println("Max benchmark = " + summary.stream().max(Comparator.comparingInt(s->s)));
+
 
     }
 
@@ -60,8 +87,7 @@ public class Downloader {
     }
 
     private void printComments(List<Comment> comments) {
-
-        comments.forEach(c-> {
+        for(Comment c: comments){
             if(c.isReply>0){
                 c.authorName = "+--Ответ: " + c.getAuthorName();
                 c.setCommentText("          " + c.getCommentText());
@@ -70,10 +96,10 @@ public class Downloader {
                 c.setCommentText(c.getCommentText() + "\n");
             }
 
-            System.out.println(c.getAuthorName() + " "
+            System.out.println(c.getIndex() + ") " + c.getAuthorName() + " "
                             + c.getCommentTime() + ": \n"
                             + c.getCommentText());
-        });
+        }
 
 //        comments.forEach(comment-> System.out.println(comment.getIndex()+") "
 //                + comment.getAuthorName()+": \n"
@@ -87,11 +113,29 @@ public class Downloader {
 
         while(!continuations.isEmpty()){
             JsonElement continuation = continuations.remove(0);
-            JsonElement ajaxResponse = JsonParser.parseString(ajaxRequest(continuation, ytcfg));
 
+            String response = ajaxRequest(continuation, ytcfg);
+            benchmark("ajaxRequest()", true);
+            JsonObject ajaxResponse = JsonParser.parseString(response).getAsJsonObject();
+//            benchmark("parseString(firstResponse)");
             List<JsonElement> actions = new ArrayList<>();
-            actions.addAll(jsonSearch(ajaxResponse, "reloadContinuationItemsCommand"));
-            actions.addAll(jsonSearch(ajaxResponse, "appendContinuationItemsAction"));
+
+//            JsonArray responseEndpoints = ajaxResponse.get("onResponseReceivedEndpoints").getAsJsonArray();
+//            for (JsonElement element : responseEndpoints) {
+//                if (element.toString().contains("reloadContinuationItemsCommand"))
+//                    actions.add(element.toString().//indexOf("reloadContinuationItemsCommand"));
+//            }
+
+            //get("reloadContinuationItemsCommand");});
+            //->element."reloadContinuationItemsCommand"
+            //либо -> "appendContinuationItemsAction"
+
+
+            actions.addAll(actionsSearch(ajaxResponse, new ArrayList<JsonElement>()));
+//            actions.addAll(jsonSearch(ajaxResponse, "reloadContinuationItemsCommand"));
+//            actions.addAll(jsonSearch(ajaxResponse, "appendContinuationItemsAction"));
+            benchmark("actions.addAll(actionsSearch(ajaxRespnse))");
+
 
             appendContinuationsFromActions(continuations, actions);
             //payloads
@@ -138,10 +182,10 @@ public class Downloader {
         }
     }
 
-    private static List<JsonElement> jsonSearch(JsonElement json, String key) {
+    private List<JsonElement> jsonSearch(JsonElement json, String key) {
         return jsonSearch(json, new ArrayList<>(), key);
     }
-    private static List<JsonElement> jsonSearch(JsonElement json, List<JsonElement> results, String key) {
+    private List<JsonElement> jsonSearch(JsonElement json, List<JsonElement> results, String key) {
         if(json.isJsonObject()){
             JsonObject jsonObject = json.getAsJsonObject();
             for (String k : jsonObject.keySet()) {
@@ -163,7 +207,35 @@ public class Downloader {
         return results;
     }
 
-    private static String regexSearch(String text, String pattern) {
+    private List<JsonElement> actionsSearch(JsonElement json, List<JsonElement> results) {
+        String key1 = "reloadContinuationItemsCommand";
+        String key2 = "appendContinuationItemsAction";
+        //System.out.println("new actionsSearch");
+        if(json.isJsonObject()){
+            JsonObject jsonObject = json.getAsJsonObject();
+            for (String k : jsonObject.keySet()) {
+                JsonElement value = jsonObject.get(k);
+                if(k.equals(key1)) {
+                    results.add(value);
+                    System.out.println("key1 has found");
+                }else if(k.equals(key2)) {
+                    results.add(value);
+                    System.out.println("key2 has found");
+                }
+                actionsSearch(value, results);
+            }
+        } else if (json.isJsonArray()) {
+            JsonArray jsonArray = json.getAsJsonArray();
+            for (JsonElement element : jsonArray) {
+                //System.out.println("jsonArray being iterated...");
+                actionsSearch(element, results);
+            }
+        }else if (json.isJsonPrimitive()) {
+            //nothing to do
+        }
+        return results;
+    }
+    private String regexSearch(String text, String pattern) {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(text);
         while (m.find())
@@ -171,6 +243,11 @@ public class Downloader {
         return null;
     }
 
+
+
+//    private String getReloadContinuationsFromAjaxResponse(JsonElement ajaxResponse){
+//        ajaxResponse.getAsJsonObject().get("onResponseReceivedEndpoints").getAsJsonArray()//get("reloadContinuationItemsCommand")
+//    }
 
 //    private Collection<? extends JsonElement> getReloadContinuations(String ajaxResponse) {
 //        Filter commentEntityPayloadFilter = Filter.filter(Criteria.where("payload").contains("commentEntityPayload"));
@@ -189,8 +266,8 @@ public class Downloader {
 //
 //        return results;
 //    }
-
     private String ajaxRequest(JsonElement continuation, JsonElement ytcfg){
+        System.out.println("AJAX request");
         String url = "https://www.youtube.com"
                 + JsonPath.read(continuation.toString(), "$.commandMetadata.webCommandMetadata.apiUrl");
 
@@ -208,6 +285,22 @@ public class Downloader {
                 .asJson();
 
         return ajaxResponse.getBody().toString();
+    }
+
+
+    private void benchmark(String name) {
+        benchmark(name, false);
+    }
+
+    private void benchmark(String name, boolean isSummaryNeeded) {
+        delta = (int) (System.currentTimeMillis() - lastTimeMillis);
+        lastTimeMillis = System.currentTimeMillis();
+        System.out.println("Timestamp for " + name + " = "
+                + (System.currentTimeMillis() - startTimeMillis) + ", lead time = " + delta +"\n");
+        if(isSummaryNeeded){
+            summary.add(delta);
+        }
+
     }
 
 }

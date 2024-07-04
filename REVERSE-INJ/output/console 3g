@@ -1,0 +1,684 @@
+C:\Users\Hungry\.jdks\corretto-17.0.10\bin\java.exe "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2022.1.2\lib\idea_rt.jar=63114:C:\Program Files\JetBrains\IntelliJ IDEA 2022.1.2\bin" -Dfile.encoding=UTF-8 -classpath C:\YT\CD3\CD3\target\classes;C:\Users\Hungry\.m2\repository\com\google\code\gson\gson\2.8.9\gson-2.8.9.jar;C:\Users\Hungry\.m2\repository\org\apache\httpcomponents\httpclient\4.5.5\httpclient-4.5.5.jar;C:\Users\Hungry\.m2\repository\org\apache\httpcomponents\httpcore\4.4.9\httpcore-4.4.9.jar;C:\Users\Hungry\.m2\repository\commons-logging\commons-logging\1.2\commons-logging-1.2.jar;C:\Users\Hungry\.m2\repository\commons-codec\commons-codec\1.10\commons-codec-1.10.jar;C:\Users\Hungry\.m2\repository\com\konghq\unirest-java\3.14.5\unirest-java-3.14.5.jar;C:\Users\Hungry\.m2\repository\org\apache\httpcomponents\httpmime\4.5.13\httpmime-4.5.13.jar;C:\Users\Hungry\.m2\repository\org\apache\httpcomponents\httpcore-nio\4.4.13\httpcore-nio-4.4.13.jar;C:\Users\Hungry\.m2\repository\org\apache\httpcomponents\httpasyncclient\4.1.5\httpasyncclient-4.1.5.jar;C:\Users\Hungry\.m2\repository\com\konghq\unirest-object-mappers-gson\4.2.9\unirest-object-mappers-gson-4.2.9.jar;C:\Users\Hungry\.m2\repository\org\slf4j\slf4j-simple\2.0.13\slf4j-simple-2.0.13.jar;C:\Users\Hungry\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\Hungry\.m2\repository\org\openjdk\jmh\jmh-core\1.37\jmh-core-1.37.jar;C:\Users\Hungry\.m2\repository\net\sf\jopt-simple\jopt-simple\5.0.4\jopt-simple-5.0.4.jar;C:\Users\Hungry\.m2\repository\org\apache\commons\commons-math3\3.6.1\commons-math3-3.6.1.jar;C:\Users\Hungry\.m2\repository\org\openjdk\jmh\jmh-generator-annprocess\1.37\jmh-generator-annprocess-1.37.jar;C:\Users\Hungry\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Hungry\.m2\repository\net\minidev\json-smart\2.5.0\json-smart-2.5.0.jar;C:\Users\Hungry\.m2\repository\net\minidev\accessors-smart\2.5.0\accessors-smart-2.5.0.jar;C:\Users\Hungry\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar varrivoda.Main
+Timestamp for first html get request = 209, lead time = 209
+
+Timestamp for getRequest.asString.getBody() = 8073, lead time = 7864
+
+html.length is 936983
+Timestamp for regex_Search YTCFG = 8159, lead time = 86
+
+Timestamp for regex_Search DATA = 8308, lead time = 149
+
+AJAX request
+Timestamp for ajaxRequest() = 10360, lead time = 2052
+
+key1 has found
+key1 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 10391, lead time = 31
+
+AJAX request
+Timestamp for ajaxRequest() = 11043, lead time = 652
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 11052, lead time = 9
+
+AJAX request
+Timestamp for ajaxRequest() = 11670, lead time = 618
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 11675, lead time = 5
+
+AJAX request
+Timestamp for ajaxRequest() = 12741, lead time = 1066
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 12744, lead time = 3
+
+AJAX request
+Timestamp for ajaxRequest() = 13484, lead time = 740
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 13489, lead time = 5
+
+AJAX request
+Timestamp for ajaxRequest() = 14086, lead time = 597
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 14091, lead time = 5
+
+AJAX request
+Timestamp for ajaxRequest() = 14697, lead time = 606
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 14700, lead time = 3
+
+AJAX request
+Timestamp for ajaxRequest() = 15300, lead time = 600
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 15305, lead time = 5
+
+AJAX request
+Timestamp for ajaxRequest() = 15892, lead time = 587
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 15896, lead time = 4
+
+AJAX request
+Timestamp for ajaxRequest() = 16745, lead time = 849
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 16751, lead time = 6
+
+AJAX request
+Timestamp for ajaxRequest() = 17540, lead time = 789
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 17546, lead time = 6
+
+AJAX request
+Timestamp for ajaxRequest() = 18141, lead time = 595
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 18143, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 18763, lead time = 620
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 18769, lead time = 6
+
+AJAX request
+Timestamp for ajaxRequest() = 19311, lead time = 542
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 19313, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 19712, lead time = 399
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 19712, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 20323, lead time = 611
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 20325, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 20651, lead time = 326
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 20651, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 20998, lead time = 347
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 20999, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 21599, lead time = 600
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 21600, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 22849, lead time = 1249
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 22849, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 23179, lead time = 330
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 23179, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 23541, lead time = 362
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 23542, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 24018, lead time = 476
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 24019, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 24419, lead time = 400
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 24419, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 24998, lead time = 579
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 24999, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 25376, lead time = 377
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 25376, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 25733, lead time = 357
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 25733, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 26333, lead time = 600
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 26334, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 27763, lead time = 1429
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 27764, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 28132, lead time = 368
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 28133, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 28461, lead time = 328
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 28461, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 28814, lead time = 353
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 28815, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 30021, lead time = 1206
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 30022, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 30399, lead time = 377
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 30400, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 31035, lead time = 635
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 31035, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 31426, lead time = 391
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 31427, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 31778, lead time = 351
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 31779, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 32158, lead time = 379
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 32158, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 32510, lead time = 352
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 32510, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 32854, lead time = 344
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 32855, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 33221, lead time = 366
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 33222, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 33555, lead time = 333
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 33555, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 33935, lead time = 380
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 33936, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 35351, lead time = 1415
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 35351, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 35943, lead time = 592
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 35944, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 36309, lead time = 365
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 36310, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 36666, lead time = 356
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 36667, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 36992, lead time = 325
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 36992, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 37316, lead time = 324
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 37316, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 37669, lead time = 353
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 37669, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 38042, lead time = 373
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 38042, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 38433, lead time = 391
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 38434, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 38881, lead time = 447
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 38883, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 40285, lead time = 1402
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 40285, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 40633, lead time = 348
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 40634, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 41221, lead time = 587
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 41222, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 41579, lead time = 357
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 41580, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 42022, lead time = 442
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 42023, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 43156, lead time = 1133
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 43156, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 43471, lead time = 315
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 43472, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 43832, lead time = 360
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 43832, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 44209, lead time = 377
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 44211, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 44595, lead time = 384
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 44596, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 44945, lead time = 349
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 44946, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 45322, lead time = 376
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 45323, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 45696, lead time = 373
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 45697, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 46145, lead time = 448
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 46145, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 46526, lead time = 381
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 46527, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 46863, lead time = 336
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 46864, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 47181, lead time = 317
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 47181, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 47533, lead time = 352
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 47533, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 47872, lead time = 339
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 47873, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 48642, lead time = 769
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 48643, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 49028, lead time = 385
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 49029, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 49430, lead time = 401
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 49431, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 49775, lead time = 344
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 49775, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 50136, lead time = 361
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 50137, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 50485, lead time = 348
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 50485, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 50907, lead time = 422
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 50908, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 51249, lead time = 341
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 51250, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 51615, lead time = 365
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 51615, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 52285, lead time = 670
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 52287, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 52694, lead time = 407
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 52696, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 53038, lead time = 342
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 53039, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 53418, lead time = 379
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 53420, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 53791, lead time = 371
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 53791, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 54141, lead time = 350
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 54142, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 54555, lead time = 413
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 54556, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 54932, lead time = 376
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 54933, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 55611, lead time = 678
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 55612, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 55998, lead time = 386
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 55999, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 56357, lead time = 358
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 56357, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 56932, lead time = 575
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 56934, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 57288, lead time = 354
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 57290, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 57584, lead time = 294
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 57585, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 57883, lead time = 298
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 57884, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 58207, lead time = 323
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 58207, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 58561, lead time = 354
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 58562, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 58910, lead time = 348
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 58910, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 59285, lead time = 375
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 59286, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 61313, lead time = 2027
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 61315, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 61697, lead time = 382
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 61699, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 62299, lead time = 600
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 62301, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 62618, lead time = 317
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 62618, lead time = 0
+
+AJAX request
+Timestamp for ajaxRequest() = 63160, lead time = 542
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 63166, lead time = 6
+
+AJAX request
+Timestamp for ajaxRequest() = 64696, lead time = 1530
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 64698, lead time = 2
+
+AJAX request
+Timestamp for ajaxRequest() = 65659, lead time = 961
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 65660, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 66617, lead time = 957
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 66618, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 66942, lead time = 324
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 66943, lead time = 1
+
+AJAX request
+Timestamp for ajaxRequest() = 67659, lead time = 716
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 67665, lead time = 6
+
+AJAX request
+Timestamp for ajaxRequest() = 68083, lead time = 418
+
+key2 has found
+Timestamp for actions.addAll(actionsSearch(ajaxRespnse)) = 68085, lead time = 2
+
+Number of meaningful method calls = 111
+Average benchmark = 536.9009009009009
+Min benchmark = Optional[294]
+Max benchmark = Optional[2052]
+Finished in 68 seconds
+
+Process finished with exit code 0

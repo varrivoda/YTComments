@@ -89,11 +89,13 @@ public class MainOld {
     public static List<JsonElement> getComments(List<JsonElement> continuations, JsonElement ytConfig) throws UnirestException {
         List<JsonElement> comments = new ArrayList<>();
         int i = 0;
+        int j=0;
 
         while (!continuations.isEmpty()) {
             JsonElement continuation = continuations.remove(0);
             JsonElement response = ajaxRequest(continuation, ytConfig);
-            //if(i==0) System.out.println("\n\n AJAX_RESPONSE № 0 IS: \n" + response);
+            if(j==1) System.out.println("\n\n AJAX_RESPONSE № "+ j + " IS: \n" + response);
+            j++;
             //System.out.println("\n\n NEXT_AJAX_RESPONSE: \n" + response.toString());
 
             List<JsonElement> actions =new ArrayList<>();
