@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.jayway.jsonpath.JsonPath;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpResponse;
+import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 
 import java.util.*;
@@ -20,11 +21,11 @@ public class Downloader {
     private String ytcfg;
     private String ytData;
 
-
     private long startTimeMillis;
     private long lastTimeMillis;
     private int delta = 0;
     private List<Integer> summary = new ArrayList<>();
+    //MultipartBody
 
     public Downloader(String url) {
         startTimeMillis = System.currentTimeMillis();
@@ -32,8 +33,10 @@ public class Downloader {
 
         GetRequest getRequest = Unirest.get(url);
         benchmark("first html get request");
+
         String html = getRequest.asString().getBody();
         benchmark("getRequest.asString.getBody()");
+
         System.out.println("html.length is "+html.length());
         this.ytcfg = regexSearch(html, RE_YTCFG);
         benchmark("regex_Search YTCFG");
@@ -44,29 +47,21 @@ public class Downloader {
     }
 
     public void download(){
-       //initial data for first filling Continuations list
-        List<JsonElement> sortMenu=jsonSearch(JsonParser.parseString(this.ytData), "sortFilterSubMenuRenderer").stream()
-                .map(element->{return element.getAsJsonObject().get("subMenuItems");})
-                .collect(Collectors.toList());
+        //initial data for first filling Continuations list
+        List<JsonElement> sortMenu= jsonSearch(JsonParser.parseString(this.ytData), "sortFilterSubMenuRenderer").stream()
+                .map(element -> {
+                    return element.getAsJsonObject().get("subMenuItems");
+                }).toList();
 
         List<JsonElement> continuations = new ArrayList<>();
         continuations.add(sortMenu.get(1).getAsJsonArray().get(0).getAsJsonObject().get("serviceEndpoint"));
 
         List<Comment> comments = getComments(continuations, JsonParser.parseString(ytcfg));
 
-//        sortComments(comments);
-//        printComments(comments);
+        sortComments(comments);
+        printComments(comments);
 
         benchmarkResults();
-
-    }
-
-    private void benchmarkResults() {
-        System.out.println("Number of meaningful method calls = " + summary.size());
-        System.out.println("Average benchmark = " + summary.stream().collect(Collectors.averagingInt(s-> s)));
-        System.out.println("Min benchmark = " + summary.stream().min(Comparator.comparingInt(s -> s)));
-        System.out.println("Max benchmark = " + summary.stream().max(Comparator.comparingInt(s->s)));
-
 
     }
 
@@ -87,24 +82,26 @@ public class Downloader {
     }
 
     private void printComments(List<Comment> comments) {
-        for(Comment c: comments){
-            if(c.isReply>0){
-                c.authorName = "+--Ответ: " + c.getAuthorName();
-                c.setCommentText("          " + c.getCommentText());
-            } else {
-                c.setAuthorName("\n"+c.getAuthorName());
-                c.setCommentText(c.getCommentText() + "\n");
+        for(int j=0;j<comments.size();j++){//(Comment c: comments){
+            Comment c = comments.get(j);
+            String gap="\n";
+            String padding = "";
+            String authorPadding = "";
+            //если не ответ, но имеет отеты
+            if(c.isReply ==0 && j<comments.size()-1 && comments.get(j + 1).isReply>0){
+                c.setCommentText(c.getCommentText() + "\n  Ответы:");
+            } else  if (c.isReply>0){
+                gap = "";
+                padding = "  ";
+                authorPadding = " -";
+                //c.setAuthorName("\n"+c.getAuthorName());
+                //c.setCommentText(c.getCommentText());
             }
 
-            System.out.println(c.getIndex() + ") " + c.getAuthorName() + " "
-                            + c.getCommentTime() + ": \n"
-                            + c.getCommentText());
+            System.out.println(gap + authorPadding + /*c.getIndex() + ") " +*/ c.getAuthorName() + " "
+                            + c.getShortDate() + ": \n"
+                            + padding + c.getCommentText());
         }
-
-//        comments.forEach(comment-> System.out.println(comment.getIndex()+") "
-//                + comment.getAuthorName()+": \n"
-//                + comment.getCommentText()+", cId:"
-//                + comment.getCommentId()));
     }
 
     public List<Comment> getComments(List<JsonElement> continuations, JsonElement ytcfg){
@@ -112,7 +109,9 @@ public class Downloader {
         List<Comment> comments = new ArrayList<>();
 
         while(!continuations.isEmpty()){
+            //continuations.forEach(s-> System.out.println(s.getAsJsonObject().keySet()));
             JsonElement continuation = continuations.remove(0);
+//            System.out.println(continuation.getAsJsonObject());
 
             String response = ajaxRequest(continuation, ytcfg);
             benchmark("ajaxRequest()", true);
@@ -143,6 +142,7 @@ public class Downloader {
             //toolbarPayloads
             //toolbarStates
 
+
             for(JsonElement comment : jsonSearch(ajaxResponse, "commentEntityPayload")) {
                 //System.out.println(comment.toString());
                 int isReply = JsonPath.read(comment.toString(), "$.properties.replyLevel");
@@ -162,11 +162,15 @@ public class Downloader {
         for(JsonElement action: actions){
             JsonArray items = action.getAsJsonObject().get("continuationItems").getAsJsonArray();
             for(JsonElement item: items){
-                if(List.of("comments-section",
-                                "engagement-panel-comments-section",
-                                "shorts-engagement-panel-comments-section")
-                        .contains(action.getAsJsonObject()
-                                .get("targetId").getAsString())){
+//                if(List.of("comments-section",
+//                                "engagement-panel-comments-section",
+//                                "shorts-engagement-panel-comments-section")
+//                        .contains(
+                                String targetId = action.getAsJsonObject()
+                                        .get("targetId").getAsString();
+                                if(targetId.equals("comments-section")
+                                        || targetId.equals("engagement-panel-comments-section")
+                                        || targetId.equals("shorts-engagement-panel-comments-section")){
                     continuations.addAll(0,jsonSearch(item, "continuationEndpoint"));
                 }
 
@@ -185,6 +189,7 @@ public class Downloader {
     private List<JsonElement> jsonSearch(JsonElement json, String key) {
         return jsonSearch(json, new ArrayList<>(), key);
     }
+
     private List<JsonElement> jsonSearch(JsonElement json, List<JsonElement> results, String key) {
         if(json.isJsonObject()){
             JsonObject jsonObject = json.getAsJsonObject();
@@ -206,7 +211,6 @@ public class Downloader {
         }
         return results;
     }
-
     private List<JsonElement> actionsSearch(JsonElement json, List<JsonElement> results) {
         String key1 = "reloadContinuationItemsCommand";
         String key2 = "appendContinuationItemsAction";
@@ -217,10 +221,10 @@ public class Downloader {
                 JsonElement value = jsonObject.get(k);
                 if(k.equals(key1)) {
                     results.add(value);
-                    System.out.println("key1 has found");
+                    System.out.println(key1 +" has found");
                 }else if(k.equals(key2)) {
                     results.add(value);
-                    System.out.println("key2 has found");
+                    System.out.println(key2 +" has found");
                 }
                 actionsSearch(value, results);
             }
@@ -235,6 +239,7 @@ public class Downloader {
         }
         return results;
     }
+
     private String regexSearch(String text, String pattern) {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(text);
@@ -248,7 +253,6 @@ public class Downloader {
 //    private String getReloadContinuationsFromAjaxResponse(JsonElement ajaxResponse){
 //        ajaxResponse.getAsJsonObject().get("onResponseReceivedEndpoints").getAsJsonArray()//get("reloadContinuationItemsCommand")
 //    }
-
 //    private Collection<? extends JsonElement> getReloadContinuations(String ajaxResponse) {
 //        Filter commentEntityPayloadFilter = Filter.filter(Criteria.where("payload").contains("commentEntityPayload"));
 //        List<JsonElement> results = JsonPath.parse(ajax).read("$['onResponseReceivedEndpoints'].[?]", commentEntityPayloadFilter);
@@ -266,17 +270,18 @@ public class Downloader {
 //
 //        return results;
 //    }
+
     private String ajaxRequest(JsonElement continuation, JsonElement ytcfg){
         System.out.println("AJAX request");
-        String url = "https://www.youtube.com"
-                + JsonPath.read(continuation.toString(), "$.commandMetadata.webCommandMetadata.apiUrl");
-
         String key = ytcfg.getAsJsonObject().get("INNERTUBE_API_KEY").getAsString();
+        String url = "https://www.youtube.com"
+                + JsonPath.read(continuation.toString(), "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
+
 
         JsonObject body = new JsonObject();
         body.add("context", ytcfg.getAsJsonObject().get("INNERTUBE_CONTEXT"));
         body.add("continuation", JsonParser.parseString(
-            JsonPath.read(continuation.toString(), "$.continuationCommand.token")));
+                JsonPath.read(continuation.toString(), "$.continuationCommand.token")));
 
         HttpResponse ajaxResponse = Unirest.post(url)
                 .header("Content-type", "application/json")
@@ -287,9 +292,52 @@ public class Downloader {
         return ajaxResponse.getBody().toString();
     }
 
+//    protected String transcriptAjaxRequest() {
+//        return JsonPath.read(this.ytData,
+//                        "$.engagementPanels[4]" +
+//                        ".engagementPanelSectionListRenderer" +
+//                                ".content" +
+//                                ".continuationItemRenderer" +
+//                                ".continuationEndpoint" +
+//                                ".getTranscriptEndpoint" +
+//                                ".params").toString();
+//    }
+    protected String transcriptAjaxRequest(){//JsonElement data, JsonElement ytcfg){
+        System.out.println("AJAX request");
+        //String key = this.ytcfg.getAsJsonObject().get("INNERTUBE_API_KEY").getAsString();
+        String url = "https://www.youtube.com/youtubei/v1/get_transcript";//+ JsonPath.read(this.ytData, "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
+
+        JsonObject body = new JsonObject();
+        body.add("context", JsonParser.parseString(ytcfg).getAsJsonObject().get("INNERTUBE_CONTEXT"));
+        body.add("params", JsonParser.parseString(
+                JsonPath.read(this.ytData,
+                        "$.engagementPanels[4]" +
+                        ".engagementPanelSectionListRenderer" +
+                                ".content" +
+                                ".continuationItemRenderer" +
+                                ".continuationEndpoint" +
+                                ".getTranscriptEndpoint" +
+                                ".params")));
+
+        HttpResponse ajaxResponse = Unirest.post(url)
+                .header("Content-type", "application/json")
+                .header("Accept", "application/json")
+                .body(body)
+                .asJson();
+
+        return ajaxResponse.getBody().toString();
+    }
 
     private void benchmark(String name) {
         benchmark(name, false);
+    }
+
+    private void benchmarkResults() {
+        System.out.println("\n\n");
+        System.out.println("Number of meaningful method calls = " + summary.size());
+        System.out.println("Average benchmark = " + summary.stream().collect(Collectors.averagingInt(s-> s)));
+        System.out.println("Min benchmark = " + summary.stream().min(Comparator.comparingInt(s -> s)));
+        System.out.println("Max benchmark = " + summary.stream().max(Comparator.comparingInt(s->s)));
     }
 
     private void benchmark(String name, boolean isSummaryNeeded) {
