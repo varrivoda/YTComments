@@ -7,19 +7,25 @@ import com.google.gson.JsonParser;
 import com.jayway.jsonpath.JsonPath;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpResponse;
-import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Downloader {
+    private static final String PATH_TO_TEST_YT = "src/test/java/yt/";
     private final String RE_YTCFG="ytcfg\\.set\\s*(\\s*\\(\\{.+?\\}\\)\\s*)\\s*;";
     private final String RE_DATA="(?:ytInitialData)\s*=\s*(.+?)\s*;\s*(?:</script|\n)";
     private String ytcfg;
     private String ytData;
+
+    private Byte SORT_BY_NEWEST = 0;
 
     private long startTimeMillis;
     private long lastTimeMillis;
@@ -37,24 +43,23 @@ public class Downloader {
         String html = getRequest.asString().getBody();
         benchmark("getRequest.asString.getBody()");
 
-        System.out.println("html.length is "+html.length());
-        this.ytcfg = regexSearch(html, RE_YTCFG);
+        saveToFile(html, PATH_TO_TEST_YT, "watch.html");
+
+
+        //System.out.println("html.length is "+html.length());
+        this.ytcfg = StringUtils.substring(regexSearch(html, RE_YTCFG),10, -2);
         benchmark("regex_Search YTCFG");
-        ytcfg = ytcfg.substring(10,ytcfg.length()-2);
-        this.ytData = regexSearch(html, RE_DATA);
+        //ytcfg = ytcfg.substring(10,ytcfg.length()-2);
+
+        this.ytData = StringUtils.substring(regexSearch(html, RE_DATA),16, -9);
         benchmark("regex_Search DATA");
-        ytData = ytData.substring(16,ytData.length()-9);
+        //ytData = ytData.substring(16,ytData.length()-9);
     }
 
     public void download(){
-        //initial data for first filling Continuations list
-        List<JsonElement> sortMenu= jsonSearch(JsonParser.parseString(this.ytData), "sortFilterSubMenuRenderer").stream()
-                .map(element -> {
-                    return element.getAsJsonObject().get("subMenuItems");
-                }).toList();
-
         List<JsonElement> continuations = new ArrayList<>();
-        continuations.add(sortMenu.get(1).getAsJsonArray().get(0).getAsJsonObject().get("serviceEndpoint"));
+
+        getInitialContinuations(continuations);
 
         List<Comment> comments = getComments(continuations, JsonParser.parseString(ytcfg));
 
@@ -63,6 +68,72 @@ public class Downloader {
 
         benchmarkResults();
 
+    }
+
+    private void getInitialContinuations(List<JsonElement> continuations) {
+        //initial data for first filling Continuations list
+        JsonElement sortMenu= jsonSearch(JsonParser.parseString(this.ytData),
+                "sortFilterSubMenuRenderer").get(0).getAsJsonObject().get("subMenuItems");
+
+        System.out.println("sortMenu:"+ sortMenu);
+
+        //sortMenu[0] = popular, sortMenu[1] = newest
+        continuations.add(sortMenu.getAsJsonArray().get(SORT_BY_NEWEST).getAsJsonObject().get("serviceEndpoint"));
+    }
+
+    public List<Comment> getComments(List<JsonElement> continuations, JsonElement ytcfg){
+        int index=0;
+        List<Comment> comments = new ArrayList<>();
+
+        while(!continuations.isEmpty()){
+            JsonElement continuation = continuations.remove(0);
+
+            String response = ajaxRequest(continuation, ytcfg);
+            benchmark("ajaxRequest()", true);
+            JsonObject ajaxResponse = JsonParser.parseString(response).getAsJsonObject();
+            List<JsonElement> actions = new ArrayList<>();
+            actions.addAll(actionsSearch(ajaxResponse, new ArrayList<JsonElement>()));
+            benchmark("actions.addAll(actionsSearch(ajaxRespnse))");
+
+            appendContinuationsFromActions(continuations, actions);
+
+
+
+            for(JsonElement comment : jsonSearch(ajaxResponse, "commentEntityPayload")) {
+                //System.out.println(comment.toString());
+                int isReply = JsonPath.read(comment.toString(), "$.properties.replyLevel");
+                String commentId = JsonPath.read(comment.toString(), "$.properties.commentId");
+                String date = JsonPath.read(comment.toString(), "$.properties.publishedTime");
+                String authorName = JsonPath.read(comment.toString(), "$.author.displayName");
+                String text = JsonPath.read(comment.toString(), "$.properties.content.content");
+
+                comments.add(new Comment(index++, isReply, commentId, date, authorName, text));
+            }
+        }
+
+        return comments;
+    }
+
+    private void saveToFile(String html, String pathToTestYt, String filename) {
+        //скачаем html для почледующих тестов
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter(pathToTestYt+filename))) {
+            writer.write(html);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveToFile(String html) {
+        saveToFile(html, "src/test/java/yt/", "watch.html");
+    }
+
+    public String getYtData(){
+        return this.ytData;
+    }
+
+    public String getYtcfg(){
+        return this.ytcfg;
     }
 
     private void sortComments(List<Comment> comments) {
@@ -99,78 +170,22 @@ public class Downloader {
             }
 
             System.out.println(gap + authorPadding + /*c.getIndex() + ") " +*/ c.getAuthorName() + " "
-                            + c.getShortDate() + ": \n"
-                            + padding + c.getCommentText());
+                    + c.getShortDate() + ": \n"
+                    + padding + c.getCommentText());
         }
-    }
-
-    public List<Comment> getComments(List<JsonElement> continuations, JsonElement ytcfg){
-        int index=0;
-        List<Comment> comments = new ArrayList<>();
-
-        while(!continuations.isEmpty()){
-            //continuations.forEach(s-> System.out.println(s.getAsJsonObject().keySet()));
-            JsonElement continuation = continuations.remove(0);
-//            System.out.println(continuation.getAsJsonObject());
-
-            String response = ajaxRequest(continuation, ytcfg);
-            benchmark("ajaxRequest()", true);
-            JsonObject ajaxResponse = JsonParser.parseString(response).getAsJsonObject();
-//            benchmark("parseString(firstResponse)");
-            List<JsonElement> actions = new ArrayList<>();
-
-//            JsonArray responseEndpoints = ajaxResponse.get("onResponseReceivedEndpoints").getAsJsonArray();
-//            for (JsonElement element : responseEndpoints) {
-//                if (element.toString().contains("reloadContinuationItemsCommand"))
-//                    actions.add(element.toString().//indexOf("reloadContinuationItemsCommand"));
-//            }
-
-            //get("reloadContinuationItemsCommand");});
-            //->element."reloadContinuationItemsCommand"
-            //либо -> "appendContinuationItemsAction"
-
-
-            actions.addAll(actionsSearch(ajaxResponse, new ArrayList<JsonElement>()));
-//            actions.addAll(jsonSearch(ajaxResponse, "reloadContinuationItemsCommand"));
-//            actions.addAll(jsonSearch(ajaxResponse, "appendContinuationItemsAction"));
-            benchmark("actions.addAll(actionsSearch(ajaxRespnse))");
-
-
-            appendContinuationsFromActions(continuations, actions);
-            //payloads
-            //payments
-            //toolbarPayloads
-            //toolbarStates
-
-
-            for(JsonElement comment : jsonSearch(ajaxResponse, "commentEntityPayload")) {
-                //System.out.println(comment.toString());
-                int isReply = JsonPath.read(comment.toString(), "$.properties.replyLevel");
-                String commentId = JsonPath.read(comment.toString(), "$.properties.commentId");
-                String date = JsonPath.read(comment.toString(), "$.properties.publishedTime");
-                String authorName = JsonPath.read(comment.toString(), "$.author.displayName");
-                String text = JsonPath.read(comment.toString(), "$.properties.content.content");
-
-                comments.add(new Comment(index++, isReply, commentId, date, authorName, text));
-            }
-        }
-
-        return comments;
     }
 
     private void appendContinuationsFromActions(List<JsonElement> continuations, List<JsonElement> actions) {
         for(JsonElement action: actions){
+            // для каждого action ищем continuationItems
             JsonArray items = action.getAsJsonObject().get("continuationItems").getAsJsonArray();
             for(JsonElement item: items){
-//                if(List.of("comments-section",
-//                                "engagement-panel-comments-section",
-//                                "shorts-engagement-panel-comments-section")
-//                        .contains(
-                                String targetId = action.getAsJsonObject()
-                                        .get("targetId").getAsString();
-                                if(targetId.equals("comments-section")
-                                        || targetId.equals("engagement-panel-comments-section")
-                                        || targetId.equals("shorts-engagement-panel-comments-section")){
+                // Для каждого action.continuationItems проверяем, если в нем targetId == "comments-section" и т.д.
+                //если да, то добавляем из текущего item в наш лист токенов
+                String targetId = action.getAsJsonObject().get("targetId").getAsString();
+                if(targetId.equals("comments-section")
+                        || targetId.equals("engagement-panel-comments-section")
+                        || targetId.equals("shorts-engagement-panel-c   omments-section")){
                     continuations.addAll(0,jsonSearch(item, "continuationEndpoint"));
                 }
 
@@ -211,6 +226,7 @@ public class Downloader {
         }
         return results;
     }
+
     private List<JsonElement> actionsSearch(JsonElement json, List<JsonElement> results) {
         String key1 = "reloadContinuationItemsCommand";
         String key2 = "appendContinuationItemsAction";
@@ -240,43 +256,19 @@ public class Downloader {
         return results;
     }
 
-    private String regexSearch(String text, String pattern) {
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(text);
-        while (m.find())
-            return m.group();
-        return null;
-    }
-
-
-
-//    private String getReloadContinuationsFromAjaxResponse(JsonElement ajaxResponse){
-//        ajaxResponse.getAsJsonObject().get("onResponseReceivedEndpoints").getAsJsonArray()//get("reloadContinuationItemsCommand")
-//    }
-//    private Collection<? extends JsonElement> getReloadContinuations(String ajaxResponse) {
-//        Filter commentEntityPayloadFilter = Filter.filter(Criteria.where("payload").contains("commentEntityPayload"));
-//        List<JsonElement> results = JsonPath.parse(ajax).read("$['onResponseReceivedEndpoints'].[?]", commentEntityPayloadFilter);
-//        return results;
-//    }
-//    private List<JsonElement> getCommentsFromAjaxResponse(String ajax){
-//        //List<JsonElement> mutations = JsonPath.read(ajax, "$.frameworkUpdates.entityBatchUpdate.mutations");
-//        //mutations.stream().forEach(mutation->mutations.put());
-////        mutations.stream().filter(mutation->JsonPath.read(mutation, "$.payload") == "commentEntityPayload").collect(Collectors.toList());
-//
-//        /*Filter commentEntityPayloadFilter = Filter.filter(Criteria.where("payload").contains("commentEntityPayload"));
-//        List<JsonElement> results = JsonPath.parse(ajax).read("$.frameworkUpdates.entityBatchUpdate.['mutations'].[?]", commentEntityPayloadFilter);
-//        */
-//
-//
-//        return results;
-//    }
+        private String regexSearch(String text, String pattern) {
+            Pattern p = Pattern.compile(pattern);
+            Matcher m = p.matcher(text);
+            while (m.find())
+                return m.group();
+            return null;
+        }
 
     private String ajaxRequest(JsonElement continuation, JsonElement ytcfg){
         System.out.println("AJAX request");
         String key = ytcfg.getAsJsonObject().get("INNERTUBE_API_KEY").getAsString();
         String url = "https://www.youtube.com"
                 + JsonPath.read(continuation.toString(), "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
-
 
         JsonObject body = new JsonObject();
         body.add("context", ytcfg.getAsJsonObject().get("INNERTUBE_CONTEXT"));
@@ -292,26 +284,18 @@ public class Downloader {
         return ajaxResponse.getBody().toString();
     }
 
-//    protected String transcriptAjaxRequest() {
-//        return JsonPath.read(this.ytData,
-//                        "$.engagementPanels[4]" +
-//                        ".engagementPanelSectionListRenderer" +
-//                                ".content" +
-//                                ".continuationItemRenderer" +
-//                                ".continuationEndpoint" +
-//                                ".getTranscriptEndpoint" +
-//                                ".params").toString();
-//    }
-    protected String transcriptAjaxRequest(){//JsonElement data, JsonElement ytcfg){
+    protected String transcriptAjaxRequest(){
         System.out.println("AJAX request");
         //String key = this.ytcfg.getAsJsonObject().get("INNERTUBE_API_KEY").getAsString();
-        String url = "https://www.youtube.com/youtubei/v1/get_transcript";//+ JsonPath.read(this.ytData, "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
+        String url = "https://www.youtube.com/youtubei/v1/get_transcript";
+        //+ JsonPath.read(this.ytData, "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
 
         JsonObject body = new JsonObject();
         body.add("context", JsonParser.parseString(ytcfg).getAsJsonObject().get("INNERTUBE_CONTEXT"));
+        //Object read = JsonPath.read(this.ytData,"$.engagementPanels");//.forEach(System.out::println);
         body.add("params", JsonParser.parseString(
                 JsonPath.read(this.ytData,
-                        "$.engagementPanels[4]" +
+                        "$.engagementPanels[6]" + // [4] before
                         ".engagementPanelSectionListRenderer" +
                                 ".content" +
                                 ".continuationItemRenderer" +

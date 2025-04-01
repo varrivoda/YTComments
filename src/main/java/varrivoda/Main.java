@@ -2,23 +2,70 @@ package varrivoda;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 //import net.minidev.json.JSONArray;
 
 public class Main {
-    public static void main(String[] args) {
+    static String URL_PREFIX="https://www.youtube.com/watch?v=";
+    //private static String WATCH = "phlsVGysQSw";
+
+
+//    static String SHORT_ID=
+    static String URL = "https://www.youtube.com/watch?v=zRQgXXBXN_g"; //массовые увольнения
+    //"https://www.youtube.com/watch?v=0gxStRo9jrI"; //Климов о пригожинстве, диверсиях и Квачкове-2003
+    //"https://www.youtube.com/watch?v=71I1zM8rMAw";// климов про Соч
+//"https://www.youtube.com/watch?v=xiYPrgGIb7U"; //миллионка
+    //"https://www.youtube.com/watch?v=GWfXK4BPKf4"; //гитлаб
+    // Юра-унитаз https://www.youtube.com/watch?v=phlsVGysQSw";
+    private static String WATCH = URL.substring(32);
+
+
+    public static void main(String[] args) throws IOException {
+        //yt забываем ?watch=
         long startTime = System.currentTimeMillis();
-        Downloader downloader = new Downloader(/* for transcript*/"https://www.youtube.com/watch?v=phlsVGysQSw");///*"https://www.youtube.com/watch?v=4QpnCbi5QyQ");*/"https://youtube.com/watch?v=mxLgL5pk0qg");
-        //downloader.download();
+        Downloader downloader = new Downloader(URL);
+
+        //writeToFile(downloader.getYtcfg());//Data());
+
+/*MAIN COMMENTS DOWNLOAD AND PRINT METHOD
+*
+*/
+        downloader.download();
+
+/* THIS CODE BELOW IS for transcript
+*  also there's some changes in downloder
+*  TODO discribe some changes in downloder
+*/
+//        getTranscript(downloader);
+
+        System.out.println(String.format("Finished in %d seconds", (System.currentTimeMillis()-startTime)/1000));
+
+    }
+
+    private static void writeToFile(String output) throws IOException {
+        String path = "src/test/java/";
+        String name=WATCH+"-ytCfg.json";
+
+        writeToFile(output, path, name);
+    }
+
+    private static void writeToFile(String output, String path, String name) throws IOException {
+        BufferedWriter writer = new BufferedWriter(
+                new FileWriter(path+name));
+        writer.write(output);
+        writer.close();
+        System.out.println("ytData has successfully written to " + path);
+    }
+
+    private static void getTranscript(Downloader downloader) {
         String pathToPhrasesArray = "$.actions[0]" +
                 ".updateEngagementPanelAction" +
                 ".content" +
@@ -60,14 +107,12 @@ public class Main {
             }
 
             if(keySet.contains("transcriptSegmentRenderer")){
-                System.out.println(JsonPath.using(conf).parse(phrase).read(pathToPhrase).toString());
+
+                String str = JsonPath.using(conf).parse(phrase).read(pathToPhrase).toString();
+                System.out.println(str.substring(1,str.length()-1));
             }
 
         }
-        //System.out.println(downloader.transcriptAjaxRequest());
-
-        System.out.println(String.format("Finished in %d seconds", (System.currentTimeMillis()-startTime)/1000));
-
     }
 }
 
