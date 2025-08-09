@@ -19,12 +19,8 @@ public class Main {
 
 
 //    static String SHORT_ID=
-    static String URL = "https://www.youtube.com/watch?v=zRQgXXBXN_g"; //массовые увольнения
-    //"https://www.youtube.com/watch?v=0gxStRo9jrI"; //Климов о пригожинстве, диверсиях и Квачкове-2003
-    //"https://www.youtube.com/watch?v=71I1zM8rMAw";// климов про Соч
-//"https://www.youtube.com/watch?v=xiYPrgGIb7U"; //миллионка
-    //"https://www.youtube.com/watch?v=GWfXK4BPKf4"; //гитлаб
-    // Юра-унитаз https://www.youtube.com/watch?v=phlsVGysQSw";
+    static String URL = "https://www.youtube.com/watch?v=gGn2zoUKsg0";
+
     private static String WATCH = URL.substring(32);
 
 
@@ -42,9 +38,9 @@ public class Main {
 
 /* THIS CODE BELOW IS for transcript
 *  also there's some changes in downloder
-*  TODO discribe some changes in downloder
+*  TODO describe some changes in downloder
 */
-//        getTranscript(downloader);
+        getTranscript(downloader);
 
         System.out.println(String.format("Finished in %d seconds", (System.currentTimeMillis()-startTime)/1000));
 

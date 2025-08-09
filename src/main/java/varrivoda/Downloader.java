@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -46,14 +47,12 @@ public class Downloader {
         saveToFile(html, PATH_TO_TEST_YT, "watch.html");
 
 
-        //System.out.println("html.length is "+html.length());
+
         this.ytcfg = StringUtils.substring(regexSearch(html, RE_YTCFG),10, -2);
         benchmark("regex_Search YTCFG");
-        //ytcfg = ytcfg.substring(10,ytcfg.length()-2);
 
         this.ytData = StringUtils.substring(regexSearch(html, RE_DATA),16, -9);
         benchmark("regex_Search DATA");
-        //ytData = ytData.substring(16,ytData.length()-9);
     }
 
     public void download(){
@@ -112,67 +111,6 @@ public class Downloader {
         }
 
         return comments;
-    }
-
-    private void saveToFile(String html, String pathToTestYt, String filename) {
-        //скачаем html для почледующих тестов
-        try (BufferedWriter writer = new BufferedWriter(
-                new FileWriter(pathToTestYt+filename))) {
-            writer.write(html);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveToFile(String html) {
-        saveToFile(html, "src/test/java/yt/", "watch.html");
-    }
-
-    public String getYtData(){
-        return this.ytData;
-    }
-
-    public String getYtcfg(){
-        return this.ytcfg;
-    }
-
-    private void sortComments(List<Comment> comments) {
-        Collections.sort(comments ,new Comparator<Comment>(){
-            @Override
-            public int compare(Comment comment1, Comment comment2) {
-                String comment1IdPart = comment1.getCommentId().split("\\.")[0];
-                String comment2IdPart = comment2.getCommentId().split("\\.")[0];
-                int commentIdComparison = comment1IdPart.compareTo(comment2IdPart);
-
-                if(commentIdComparison == 0){
-                    return Integer.compare(comment1.getIndex(), comment2.getIndex());
-                }
-                return commentIdComparison;
-            }
-        });
-    }
-
-    private void printComments(List<Comment> comments) {
-        for(int j=0;j<comments.size();j++){//(Comment c: comments){
-            Comment c = comments.get(j);
-            String gap="\n";
-            String padding = "";
-            String authorPadding = "";
-            //если не ответ, но имеет отеты
-            if(c.isReply ==0 && j<comments.size()-1 && comments.get(j + 1).isReply>0){
-                c.setCommentText(c.getCommentText() + "\n  Ответы:");
-            } else  if (c.isReply>0){
-                gap = "";
-                padding = "  ";
-                authorPadding = " -";
-                //c.setAuthorName("\n"+c.getAuthorName());
-                //c.setCommentText(c.getCommentText());
-            }
-
-            System.out.println(gap + authorPadding + /*c.getIndex() + ") " +*/ c.getAuthorName() + " "
-                    + c.getShortDate() + ": \n"
-                    + padding + c.getCommentText());
-        }
     }
 
     private void appendContinuationsFromActions(List<JsonElement> continuations, List<JsonElement> actions) {
@@ -256,13 +194,13 @@ public class Downloader {
         return results;
     }
 
-        private String regexSearch(String text, String pattern) {
-            Pattern p = Pattern.compile(pattern);
-            Matcher m = p.matcher(text);
-            while (m.find())
-                return m.group();
-            return null;
-        }
+    private String regexSearch(String text, String pattern) {
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(text);
+        while (m.find())
+            return m.group();
+        return null;
+    }
 
     private String ajaxRequest(JsonElement continuation, JsonElement ytcfg){
         System.out.println("AJAX request");
@@ -286,22 +224,27 @@ public class Downloader {
 
     protected String transcriptAjaxRequest(){
         System.out.println("AJAX request");
+        // как ни странно, но всё работает без извлеченного апи-ключа
         //String key = this.ytcfg.getAsJsonObject().get("INNERTUBE_API_KEY").getAsString();
         String url = "https://www.youtube.com/youtubei/v1/get_transcript";
         //+ JsonPath.read(this.ytData, "$.commandMetadata.webCommandMetadata.apiUrl") + "?key=";//+key;
 
         JsonObject body = new JsonObject();
         body.add("context", JsonParser.parseString(ytcfg).getAsJsonObject().get("INNERTUBE_CONTEXT"));
-        //Object read = JsonPath.read(this.ytData,"$.engagementPanels");//.forEach(System.out::println);
-        body.add("params", JsonParser.parseString(
-                JsonPath.read(this.ytData,
-                        "$.engagementPanels[6]" + // [4] before
-                        ".engagementPanelSectionListRenderer" +
-                                ".content" +
-                                ".continuationItemRenderer" +
-                                ".continuationEndpoint" +
-                                ".getTranscriptEndpoint" +
-                                ".params")));
+
+        String transcriptEndpoint = null;
+
+        for (int i = 4; i <= 6; i++) {
+            try {
+                transcriptEndpoint = getTranscriptEndpoint(i); // получение вынесено в отдельный метод
+                break; // если нашли — выходим из цикла
+            } catch (PathNotFoundException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+                System.out.println("PathNotFoundException: engagementPanel#"+i+" is not for transcript");
+                // приложение не упало, просто пробуем следующий индекс
+            }
+        }
+
+        body.add("params", JsonParser.parseString(transcriptEndpoint));
 
         HttpResponse ajaxResponse = Unirest.post(url)
                 .header("Content-type", "application/json")
@@ -310,6 +253,82 @@ public class Downloader {
                 .asJson();
 
         return ajaxResponse.getBody().toString();
+    }
+
+    private String getTranscriptEndpoint(int engagementPanelIndex) {
+        String transcriptEndpoint;
+        transcriptEndpoint = JsonPath.read(this.ytData,
+                "$.engagementPanels[" +
+                            engagementPanelIndex +
+                        "]" +
+                        ".engagementPanelSectionListRenderer" +
+                        ".content" +
+                        ".continuationItemRenderer" +
+                        ".continuationEndpoint" +
+                        ".getTranscriptEndpoint" +
+                        ".params");
+        return transcriptEndpoint;
+    }
+
+    private void saveToFile(String html, String pathToTestYt, String filename) {
+        //скачаем html для поcледующих тестов
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter(pathToTestYt+filename))) {
+            writer.write(html);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveToFile(String html) {
+        saveToFile(html, "src/test/java/yt/", "watch.html");
+    }
+
+    public String getYtData(){
+        return this.ytData;
+    }
+
+    public String getYtcfg(){
+        return this.ytcfg;
+    }
+
+    private void sortComments(List<Comment> comments) {
+        Collections.sort(comments ,new Comparator<Comment>(){
+            @Override
+            public int compare(Comment comment1, Comment comment2) {
+                String comment1IdPart = comment1.getCommentId().split("\\.")[0];
+                String comment2IdPart = comment2.getCommentId().split("\\.")[0];
+                int commentIdComparison = comment1IdPart.compareTo(comment2IdPart);
+
+                if(commentIdComparison == 0){
+                    return Integer.compare(comment1.getIndex(), comment2.getIndex());
+                }
+                return commentIdComparison;
+            }
+        });
+    }
+
+    private void printComments(List<Comment> comments) {
+        for(int j=0;j<comments.size();j++){//(Comment c: comments){
+            Comment c = comments.get(j);
+            String gap="\n";
+            String padding = "";
+            String authorPadding = "";
+            //если не ответ, но имеет отеты
+            if(c.isReply ==0 && j<comments.size()-1 && comments.get(j + 1).isReply>0){
+                c.setCommentText(c.getCommentText() + "\n  Ответы:");
+            } else  if (c.isReply>0){
+                gap = "";
+                padding = "  ";
+                authorPadding = " -";
+                //c.setAuthorName("\n"+c.getAuthorName());
+                //c.setCommentText(c.getCommentText());
+            }
+
+            System.out.println(gap + authorPadding + /*c.getIndex() + ") " +*/ c.getAuthorName() + " "
+                    + c.getShortDate() + ": \n"
+                    + padding + c.getCommentText());
+        }
     }
 
     private void benchmark(String name) {
