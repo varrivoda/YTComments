@@ -1,0 +1,54 @@
+{
+	"sortFilterSubMenuRenderer": {
+		"subMenuIetms": [
+			{
+				"title": "Сначала популярные",
+				"selected": true,
+				"serviceEndpoint": {
+					"clickTrackingParams": "CCsQ48AHGAAiEwiEk7zWrP2OAxX7yk8IHZFpB9Y=",
+					"commandMetadata": {
+						"webCommandMetadata": {
+							"sendPost": true,
+							"apiUrl": "/youtubei/v1/next"
+						}
+					},
+					"continuationCommand": {
+						"token": "Eg0SC2dHbjJ6b1VLc2cwGAYyOCIRIgtnR24yem9VS3NnMDAAeAIwAUIhZW5nYWdlbWVudC1wYW5lbC1jb21tZW50cy1zZWN0aW9u",
+						"request": "CONTINUATION_REQUEST_TYPE_WATCH_NEXT",
+						"command": {
+							"clickTrackingParams": "CCsQ48AHGAAiEwiEk7zWrP2OAxX7yk8IHZFpB9Y=",
+							"showReloadUiCommand": {
+								"targetId": "engagement-panel-comments-section"
+							}
+						}
+					}
+				},
+				"trackingParams": "CCsQ48AHGAAiEwiEk7zWrP2OAxX7yk8IHZFpB9Y="
+			},
+			{
+				"title": "Сначала новые",
+				"selected": false,
+				"serviceEndpoint": {
+					"clickTrackingParams": "CCoQ48AHGAEiEwiEk7zWrP2OAxX7yk8IHZFpB9Y=",
+					"commandMetadata": {
+						"webCommandMetadata": {
+							"sendPost": true,
+							"apiUrl": "/youtubei/v1/next"
+						}
+					},
+					"continuationCommand": {
+						"token": "Eg0SC2dHbjJ6b1VLc2cwGAYyOCIRIgtnR24yem9VS3NnMDABeAIwAUIhZW5nYWdlbWVudC1wYW5lbC1jb21tZW50cy1zZWN0aW9u",
+						"request": "CONTINUATION_REQUEST_TYPE_WATCH_NEXT",
+						"command": {
+							"clickTrackingParams": "CCoQ48AHGAEiEwiEk7zWrP2OAxX7yk8IHZFpB9Y=",
+							"showReloadUiCommand": {
+								"targetId": "engagement-panel-comments-section"
+							}
+						}
+					}
+				},
+				"trackingParams": "CCoQ48AHGAEiEwiEk7zWrP2OAxX7yk8IHZFpB9Y="
+			}
+		]
+	}
+}

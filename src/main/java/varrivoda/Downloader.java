@@ -74,8 +74,6 @@ public class Downloader {
         JsonElement sortMenu= jsonSearch(JsonParser.parseString(this.ytData),
                 "sortFilterSubMenuRenderer").get(0).getAsJsonObject().get("subMenuItems");
 
-        System.out.println("sortMenu:"+ sortMenu);
-
         //sortMenu[0] = popular, sortMenu[1] = newest
         continuations.add(sortMenu.getAsJsonArray().get(SORT_BY_NEWEST).getAsJsonObject().get("serviceEndpoint"));
     }
@@ -89,6 +87,10 @@ public class Downloader {
 
             String response = ajaxRequest(continuation, ytcfg);
             benchmark("ajaxRequest()", true);
+
+            //DEBUG
+            //System.out.println("AJAX_RESPONSE_BODY: "+response);
+
             JsonObject ajaxResponse = JsonParser.parseString(response).getAsJsonObject();
             List<JsonElement> actions = new ArrayList<>();
             actions.addAll(actionsSearch(ajaxResponse, new ArrayList<JsonElement>()));

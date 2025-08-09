@@ -1,0 +1,21 @@
+{
+  "serviceEndpoint": {
+    "clickTrackingParams": "CBkQ48AHGAAiEwixss7syMGGAxXE5E8IHa6nClI=",
+    "commandMetadata": {
+      "webCommandMetadata": {
+        "sendPost": true,
+        "apiUrl": "/youtubei/v1/next"
+      }
+    },
+    "continuationCommand": {
+      "token": "Eg0SC2VfTTFjV3FqaFhRGAYyVSIuIgtlX00xY1dxamhYUTAAeAKqAhpVZ3hvckJtUFIzdmYtZmJRalhsNEFhQUJBZzABQiFlbmdhZ2VtZW50LXBhbmVsLWNvbW1lbnRzLXNlY3Rpb24%3D",
+      "request": "CONTINUATION_REQUEST_TYPE_WATCH_NEXT",
+      "command": {
+        "clickTrackingParams": "CBkQ48AHGAAiEwixss7syMGGAxXE5E8IHa6nClI=",
+        "showReloadUiCommand": {
+          "targetId": "engagement-panel-comments-section"
+        }
+      }
+    }
+  }
+}
