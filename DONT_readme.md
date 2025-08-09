@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:DONT_README.MD
 # YTComments 0.0.6
+========
+# YTComments 0.0.5
+>>>>>>>> origin/master:DONT_readme.md
 Утилита для парсинга html Ютуба и скачивания комментариев к видео.
 Здесь будет история написания в обратном хронологическом порядке.
 
@@ -14,7 +18,11 @@
 Эти сервисы можно строить по push и pull модели, попробую сделать по push
 
 ## 0.0.5 show transcript
+<<<<<<<< HEAD:DONT_README.MD
 Рефактор снова откладыввается: мне некогда, но вернулся сюдаэтому проекту, потому что понадобилось скачивать субтитры с видео.
+========
+Рефактор снова откладыввается: мне некогда, но вернулся сюда, потому что понадобилось скачивать субтитры.
+>>>>>>>> origin/master:DONT_readme.md
 
 На странице при нажатии на show transcript отсылается ajax-запрос на эндпойнт "/get_transcript?prettyPrint=false", с параметрами context: {сюда идет наш INNERTUBE_CONTEXT} и params:{сюда хэш унакальной операции,который можно взять из того же DATA по JsonPath "$.engagementPanels.engagementPanelSectionListRenderer.content.continuationItemRenderer.continuationEndpoint.getTranscriptEndpoint" }
 
